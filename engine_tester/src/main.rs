@@ -16,8 +16,33 @@ const PLAYER_SPEED: f32 = 2.0;
 impl Game for MyGame {
     fn init(&mut self, engine: &mut GameEngine) {
         RenderCommand::set_clear_color(0.06, 0.06, 0.06, 1.0);
-        self.ui = Some(Ui::new());
         engine.get_window().set_vsync(true);
+
+        self.ui = Some(Ui::new(engine));
+
+        let ui = self.ui.as_mut().unwrap();
+
+        let container = ui.base.push_child(Box::new(UiBox::new(
+            Cordinate::default(),
+            Cordinate::default(),
+            Dimension::new(DimensionType::Relative, 0.5),
+            Dimension::new(DimensionType::Relative, 0.5),
+            Vector4::new(0.0, 0.0, 1.0, 1.0),
+            20.0,
+            3.0,
+            Vector4::new(1.0, 1.0, 1.0, 1.0),
+        )));
+
+        let inner = container.borrow_mut().push_child(Box::new(UiBox::new(
+            Cordinate::new(CordinateType::Relative, CordinateCenter::Min, 0.0),
+            Cordinate::new(CordinateType::Relative, CordinateCenter::Min, 0.0),
+            Dimension::new(DimensionType::Aspect, 1.0),
+            Dimension::new(DimensionType::Relative, 0.3),
+            Vector4::new(1.0, 0.0, 0.0, 1.0),
+            10.0,
+            3.0,
+            Vector4::new(1.0, 1.0, 1.0, 1.0),
+        )));
     }
 
     fn update(&mut self, engine: &mut GameEngine) {
@@ -45,37 +70,6 @@ impl Game for MyGame {
     }
 
     fn draw(&mut self, engine: &mut GameEngine) {
-        let ui = self.ui.as_mut().unwrap();
-        ui.new_frame(engine);
-
-        ui.begin(Vector2::new(0.0, 0.0), 10.0);
-        ui.begin_layout(UiLayoutKind::Vertical, 10.0);
-
-        if ui.button(
-            Vector2::new(50.0, 50.0),
-            Vector4::new(1.0, 0.0, 0.0, 1.0),
-            0,
-        ) {
-            self.player_color = Vector4::new(1.0, 0.0, 0.0, 1.0);
-        }
-        if ui.button(
-            Vector2::new(50.0, 50.0),
-            Vector4::new(0.0, 1.0, 0.0, 1.0),
-            1,
-        ) {
-            self.player_color = Vector4::new(0.0, 1.0, 0.0, 1.0);
-        }
-        if ui.button(
-            Vector2::new(50.0, 50.0),
-            Vector4::new(0.0, 0.0, 1.0, 1.0),
-            2,
-        ) {
-            self.player_color = Vector4::new(0.0, 0.0, 1.0, 1.0);
-        }
-
-        ui.end_layout();
-        ui.end();
-
         engine.renderer.begin_scene(&self.camera);
 
         engine.renderer.draw_quad(
@@ -86,6 +80,11 @@ impl Game for MyGame {
         );
 
         engine.renderer.end_scene();
+
+        let ui = self.ui.as_mut().unwrap();
+
+        ui.update(engine);
+        ui.render();
     }
 }
 

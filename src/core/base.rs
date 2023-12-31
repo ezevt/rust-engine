@@ -27,11 +27,11 @@ impl GameEngine {
         }
     }
 
-    pub fn set_cursor_pos(&mut self, x: f32, y: f32) {
+    pub fn set_cursor_position(&mut self, x: f32, y: f32) {
         self.window.window_handle.set_cursor_pos(x as f64, y as f64);
     }
 
-    pub fn get_cursor_pos(&self) -> (f32, f32) {
+    pub fn get_cursor_position(&self) -> (f32, f32) {
         let (posx, posy) = self.window.window_handle.get_cursor_pos();
         return (posx as f32, posy as f32);
     }
